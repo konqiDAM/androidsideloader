@@ -881,7 +881,7 @@
             this.gamesQueueLabel.DataBindings.Add(new System.Windows.Forms.Binding("Font", global::AndroidSideloader.Properties.Settings.Default, "FontStyle", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.gamesQueueLabel.Font = global::AndroidSideloader.Properties.Settings.Default.FontStyle;
             this.gamesQueueLabel.ForeColor = global::AndroidSideloader.Properties.Settings.Default.FontColor;
-            this.gamesQueueLabel.Location = new System.Drawing.Point(605, 640);
+            this.gamesQueueLabel.Location = new System.Drawing.Point(605, 648);
             this.gamesQueueLabel.Name = "gamesQueueLabel";
             this.gamesQueueLabel.Size = new System.Drawing.Size(95, 16);
             this.gamesQueueLabel.TabIndex = 86;
@@ -945,12 +945,13 @@
             this.DragDropLbl.DataBindings.Add(new System.Windows.Forms.Binding("ForeColor", global::AndroidSideloader.Properties.Settings.Default, "FontColor", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.DragDropLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DragDropLbl.ForeColor = global::AndroidSideloader.Properties.Settings.Default.FontColor;
-            this.DragDropLbl.Location = new System.Drawing.Point(630, 563);
+            this.DragDropLbl.Location = new System.Drawing.Point(610, 593);
             this.DragDropLbl.Name = "DragDropLbl";
             this.DragDropLbl.Size = new System.Drawing.Size(320, 55);
             this.DragDropLbl.TabIndex = 25;
             this.DragDropLbl.Text = "DragDropLBL";
             this.DragDropLbl.Visible = false;
+            this.DragDropLbl.Click += new System.EventHandler(this.DragDropLbl_Click);
             // 
             // label1
             // 
