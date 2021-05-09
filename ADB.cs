@@ -115,7 +115,7 @@ namespace AndroidSideloader
             if (packagename.Length>0)
             {
                 Program.form.ChangeTitle($"Trying to delete old app {packagename}");
-                ret += RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{Sideloader.TempFolder}\"");
+                ret += RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{Path.Combine(Sideloader.TempFolder, packagename)}\"");
                 ret += RunAdbCommandToString($"shell pm uninstall {packagename}");
                 ret += RunAdbCommandToString($"install -g -r \"{path}\"");
                 ret += RunAdbCommandToString($"push \"{Path.Combine(Sideloader.TempFolder,packagename)}\" \"/sdcard/Android/data/\"");
