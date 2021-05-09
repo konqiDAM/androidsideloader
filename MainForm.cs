@@ -280,6 +280,7 @@ namespace AndroidSideloader
             gamesListView.FullRowSelect = true;
             gamesListView.GridLines = true;
 
+
             if (File.Exists(Sideloader.CrashLogPath))
             {
                 DialogResult dialogResult = FlexibleMessageBox.Show(this, $@"Looks like sideloader crashed last time, please make an issue at https://github.com/nerdunit/androidsideloader/issues
@@ -296,6 +297,15 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             else
                 FlexibleMessageBox.Show("Cannot connect to google dns, your internet may be down, won't use rclone or online features!");
             await Task.Delay(100);
+
+            if (!Directory.Exists(BackupFolder))
+                Directory.CreateDirectory(BackupFolder);
+
+            if (Directory.Exists(Sideloader.TempFolder))
+            {
+                Directory.Delete(Sideloader.TempFolder, true);
+                Directory.CreateDirectory(Sideloader.TempFolder);
+            }
 
             //Delete the Debug file if it is more than 5MB
             if (File.Exists(Logger.logfile))
@@ -353,7 +363,7 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             ToolTip dlsToolTip = new ToolTip();
             dlsToolTip.SetToolTip(this.speedLabel, "Current download speed, updates every second, in mbps");
         }
-
+        public static string BackupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"Rookie Backups");
         private async void backupbutton_Click(object sender, EventArgs e)
         {
             ProcessOutput output = new ProcessOutput("", "");
@@ -361,12 +371,10 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             {
 
                 string date_str = DateTime.Today.ToString("dd.MM.yyyy");
-
+                string CurrBackups = Path.Combine(BackupFolder, date_str);
                 MessageBox.Show($"This may take up to a minute. Backing up gamesaves to Documents\\Rookie Backups\\{date_str}");
-                string backups = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"Rookie Backups\\{date_str}");
-                Directory.CreateDirectory(backups);
 
-                output = ADB.RunAdbCommandToString($"pull \"/sdcard/Android/data\" \"{backups}");
+                output = ADB.RunAdbCommandToString($"pull \"/sdcard/Android/data\" \"{CurrBackups}\"");
 
 
                 try

@@ -107,18 +107,22 @@ namespace AndroidSideloader
         {
             RunAdbCommandToString("shell input keyevent KEYCODE_WAKEUP");
         }
-
         public static ProcessOutput Sideload(string path, string packagename = "")
         {
             WakeDevice();
             ProcessOutput ret = new ProcessOutput();
+            Program.form.ChangeTitle($"Sideloading {path}");
             if (packagename.Length>0)
             {
                 Program.form.ChangeTitle($"Trying to delete old app {packagename}");
-                ADB.RunAdbCommandToString($"shell pm uninstall -k {packagename}");
+                ret += RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{Sideloader.TempFolder}\"");
+                ret += RunAdbCommandToString($"shell pm uninstall {packagename}");
+                ret += RunAdbCommandToString($"install -g -r \"{path}\"");
+                ret += RunAdbCommandToString($"push \"{Path.Combine(Sideloader.TempFolder,packagename)}\" \"/sdcard/Android/data/\"");
+
             }
-            Program.form.ChangeTitle($"Sideloading {path}");
-            ret = RunAdbCommandToString($"install -g -r \"{path}\"");
+            else
+                ret += RunAdbCommandToString($"install -g -r \"{path}\"");
             Program.form.ChangeTitle($"Sideload done");
             return ret;
         }

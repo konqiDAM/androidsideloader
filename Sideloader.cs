@@ -13,7 +13,7 @@ namespace AndroidSideloader
 {
     class Sideloader
     {
-
+        public static string TempFolder = Path.Combine(Environment.CurrentDirectory, "temp");
         public static string CrashLogPath = "crashlog.txt";
 
         public static string SpooferWarning = @"Please make sure you have installed:
