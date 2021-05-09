@@ -45,6 +45,8 @@ And all of them added to PATH, without ANY of them, the spoofer won't work!";
         }
 
         //For games that require manual install, like having another folder that isnt an obb
+
+        //TOFIX
         public static ProcessOutput RunADBCommandsFromFile(string path, string RunFromPath)
         {
             ADB.WakeDevice();
@@ -55,7 +57,7 @@ And all of them added to PATH, without ANY of them, the spoofer won't work!";
                 if (cmd.StartsWith("adb"))
                 {
                     var regex = new Regex(Regex.Escape("adb"));
-                    var command = regex.Replace(cmd, $"\"{ADB.adbFilePath}\"", 1);
+                    var command = regex.Replace("adb", $"\"{ADB.adbFilePath}\"", 1);
 
                     Logger.Log($"Logging command: {command} from file: {path}");
 

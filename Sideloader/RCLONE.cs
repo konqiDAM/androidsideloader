@@ -70,7 +70,8 @@ namespace AndroidSideloader
             gameProperties.Clear();
             games.Clear();
             string tempGameList = RCLONE.runRcloneCommand($"cat \"{remote}:{RcloneGamesFolder}/GameList.txt\"").Output;
-            //File.WriteAllText("GamesList.txt", tempGameList);
+            if (MainForm.debugMode)
+                File.WriteAllText("GamesList.txt", tempGameList);
             string gamePropertiesLine = Utilities.StringUtilities.RemoveEverythingAfterFirst(tempGameList, "\n");
 
             foreach (string gameProperty in gamePropertiesLine.Split(';'))

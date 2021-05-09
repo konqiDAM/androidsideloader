@@ -927,12 +927,12 @@
             this.notesRichTextBox.DataBindings.Add(new System.Windows.Forms.Binding("ForeColor", global::AndroidSideloader.Properties.Settings.Default, "FontColor", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.notesRichTextBox.ForeColor = global::AndroidSideloader.Properties.Settings.Default.FontColor;
             this.notesRichTextBox.HideSelection = false;
-            this.notesRichTextBox.Location = new System.Drawing.Point(601, 659);
+            this.notesRichTextBox.Location = new System.Drawing.Point(601, 671);
             this.notesRichTextBox.Name = "notesRichTextBox";
             this.notesRichTextBox.ReadOnly = true;
             this.notesRichTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
             this.notesRichTextBox.ShowSelectionMargin = true;
-            this.notesRichTextBox.Size = new System.Drawing.Size(371, 86);
+            this.notesRichTextBox.Size = new System.Drawing.Size(371, 74);
             this.notesRichTextBox.TabIndex = 85;
             this.notesRichTextBox.Text = "";
             // 

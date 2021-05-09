@@ -294,7 +294,7 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             if (HasInternet == true)
                 Sideloader.downloadFiles();
             else
-                FlexibleMessageBox.Show("Cannont connect to google dns, your internet may be down, won't use rclone or online features!");
+                FlexibleMessageBox.Show("Cannot connect to google dns, your internet may be down, won't use rclone or online features!");
             await Task.Delay(100);
 
             //Delete the Debug file if it is more than 5MB
@@ -948,9 +948,10 @@ without him none of this would be possible
 
             ProcessOutput output = new ProcessOutput("", "");
 
+            string gameName = "";
             while (gamesQueueList.Count > 0)
             {
-                string gameName = gamesQueueList.ToArray()[0];
+                gameName = gamesQueueList.ToArray()[0];
 
                 string gameDirectory = Environment.CurrentDirectory + "\\" + gameName;
                 Directory.CreateDirectory(gameDirectory);
@@ -969,6 +970,7 @@ without him none of this would be possible
                 ChangeTitle("Downloading game " + gameName, false);
 
                 int i = 0;
+                //Download
                 while (t1.IsAlive)
                 {
                     try
@@ -1062,19 +1064,14 @@ without him none of this would be possible
                         {
                             Thread apkThread = new Thread(() =>
                             {
-                                if (Properties.Settings.Default.ResignAPKs)
+                                string packagename = "";
+                                foreach (var release in SideloaderRCLONE.games)
                                 {
-                                    var rand = new Random();
-                                    ChangeTitle($"Resigning {file}");
-                                    //spoofer.PackageName(file);
-                                    output += spoofer.SpoofApk(file, spoofer.PackageName(file), "", Path.GetFileNameWithoutExtension(file) + "r.apk");
-                                    ChangeTitle($"Done resigning {file}");
-                                    output += ADB.Sideload(spoofer.spoofedApkPath);
+                                    if (string.Equals(release[SideloaderRCLONE.ReleaseNameIndex], gameName))
+                                        packagename = release[SideloaderRCLONE.PackageNameIndex];
                                 }
-                                else
-                                    output += ADB.Sideload(file);
+                                output += ADB.Sideload(file, packagename);
                             });
-                            apkThread.IsBackground = true;
                             apkThread.Start();
 
                             while (apkThread.IsAlive)

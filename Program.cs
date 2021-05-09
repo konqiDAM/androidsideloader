@@ -25,6 +25,7 @@ namespace AndroidSideloader
             //form.Show();
         }
         public static MainForm form;
+        //handle crashes
         static void MyHandler(object sender, UnhandledExceptionEventArgs args)
         {
             Exception e = (Exception)args.ExceptionObject;
