@@ -370,9 +370,9 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             Thread t1 = new Thread(() =>
             {
 
-                string date_str = DateTime.Today.ToString("dd.MM.yyyy");
+                string date_str = DateTime.Today.ToString("yyyy.mm.dd");
                 string CurrBackups = Path.Combine(BackupFolder, date_str);
-                MessageBox.Show($"This may take up to a minute. Backing up gamesaves to Documents\\Rookie Backups\\{date_str}");
+                MessageBox.Show($"This may take up to a minute. Backing up gamesaves to Documents\\Rookie Backups\\{date_str} (year.month.date)");
 
                 output = ADB.RunAdbCommandToString($"pull \"/sdcard/Android/data\" \"{CurrBackups}\"");
 
@@ -588,6 +588,12 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
                         foreach (string folder in folders)
                         {
                             output += ADB.CopyOBB(folder);
+                            string out2 = output.Error;
+                            if (out2.Contains("failure"))
+                            {
+                                DialogResult dialogResult = MessageBox.Show("In-place upgrade failed. Please manually uninstall current version first!", "UPGRADE FAILED!", MessageBoxButtons.OK);
+                            }
+
                         }
                     }
                     //if it's a file
@@ -637,8 +643,9 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
             DragDropLbl.Visible = true;
-            DragDropLbl.Text = "Drag apk or obb";
+            DragDropLbl.Text = "Drag apk or obb folder here to install";
             ChangeTitle(DragDropLbl.Text);
+
         }
 
         private void Form1_DragLeave(object sender, EventArgs e)
@@ -1067,9 +1074,15 @@ without him none of this would be possible
                     foreach (string file in files)
                     {
                         Debug.WriteLine(file);
+                        string folder = Path.GetDirectoryName(file);
                         string extension = Path.GetExtension(file);
                         if (extension == ".apk")
                         {
+                            if (folder.Contains("Intsall.txt"))
+
+                            {
+
+                            }
                             Thread apkThread = new Thread(() =>
                             {
                                 string packagename = "";
@@ -1079,10 +1092,60 @@ without him none of this would be possible
                                         packagename = release[SideloaderRCLONE.PackageNameIndex];
                                 }
                                 output += ADB.Sideload(file, packagename);
+                                
+                                string out2 = output.Error;
+                                if (!out2.Contains("failure"))
+                                {
+                                    
+                                 DialogResult dialogResult2 = MessageBox.Show("In-place upgrade failed.  We will need to upgrade by uninstalling, and keeping savedata isn't guaranteed.  Continue?", "UPGRADE FAILED!",  MessageBoxButtons.OKCancel);
+                                    if (dialogResult2 != DialogResult.OK)
+                                    {
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        string date_str = DateTime.Today.ToString("yyyy.mm.dd");
+                                        string CurrBackups = Path.Combine(BackupFolder, date_str);
+
+
+                                        MessageBox.Show($"Searching for save files...", "Searching!", MessageBoxButtons.OK);
+                                        if (Directory.Exists($"/sdcard/Android/data/{packagename}"))
+                                        {
+                                            MessageBox.Show($"Tryingto backup save to Documents\\Rookie Backups\\{date_str}(year.month.date)\\{packagename}", "Save files found", MessageBoxButtons.OK);
+                                            output += ADB.RunAdbCommandToString("adb shell pm -k uninstall " + packagename);
+                                            Directory.CreateDirectory(CurrBackups);
+                                            String CurrbackupPaths = CurrBackups + "\\data";
+                                            Directory.CreateDirectory(CurrbackupPaths);
+                                            ADB.RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{CurrBackups}\"");
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show($"No backups found! Continue with the uninstall!", "None Found", MessageBoxButtons.OK);
+
+                                        }
+                                        
+                                        ADB.RunAdbCommandToString("shell rm -r " + packagename);
+                                        try
+                                        {
+                                            Directory.Move(ADB.adbFolderPath + "\\data", Environment.CurrentDirectory + "\\" + packagename);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Log($"Exception on backup: {ex.ToString()}");
+                                        }
+                                        output += ADB.Sideload(file, packagename);
+
+
+                                    }
+                                }  
+                                
+
                             });
+
                             apkThread.Start();
 
                             while (apkThread.IsAlive)
+
                                 await Task.Delay(100);
                         }
                     }

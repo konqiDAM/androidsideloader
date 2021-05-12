@@ -53,7 +53,6 @@ namespace AndroidSideloader
         {
             WakeDevice();
             ProcessOutput output = new ProcessOutput("", "");
-            output += RunAdbCommandToString($"shell pm uninstall -k --user 0 {package}");
             output += RunAdbCommandToString($"shell pm uninstall {package}");
             return output;
         }
@@ -113,16 +112,7 @@ namespace AndroidSideloader
             ProcessOutput ret = new ProcessOutput();
             Program.form.ChangeTitle($"Sideloading {path}");
             if (packagename.Length>0)
-            {
-                Program.form.ChangeTitle($"Trying to delete old app {packagename}");
-                ret += RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{Path.Combine(Sideloader.TempFolder, packagename)}\"");
-                ret += RunAdbCommandToString($"shell pm uninstall {packagename}");
-                ret += RunAdbCommandToString($"install -g -r \"{path}\"");
-                ret += RunAdbCommandToString($"push \"{Path.Combine(Sideloader.TempFolder,packagename)}\" \"/sdcard/Android/data/\"");
-
-            }
-            else
-                ret += RunAdbCommandToString($"install -g -r \"{path}\"");
+            ret += RunAdbCommandToString($"install -g -r \"{path}\"");
             Program.form.ChangeTitle($"Sideload done");
             return ret;
         }

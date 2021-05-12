@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AndroidSideloader
 {
     public partial class QuestForm : Form
     {
+        public static int length = 0;
+        public static string[] result;
+        private readonly string executeString;
+
         public QuestForm()
         {
             InitializeComponent();
@@ -23,7 +28,7 @@ namespace AndroidSideloader
                 ChangesMade = true;
             }
 
-            if (TextureResTextBox.Text.Length>0)
+            if (TextureResTextBox.Text.Length > 0)
             {
                 Int32.TryParse(TextureResTextBox.Text, out int result);
                 ADB.RunAdbCommandToString($"shell settings put global texture_size_Global {TextureResTextBox.Text}");
@@ -47,6 +52,40 @@ namespace AndroidSideloader
 
             if (ChangesMade)
                 MessageBox.Show("Settings applied!");
+        }
+
+
+
+        public static void setLength(int value)
+        {
+            result = new string[value];
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+
+        {
+
+            string input = ADB.RunAdbCommandToString("shell ip route").Output;
+            string lastWord = input.Substring(input.LastIndexOf('.') + 1);
+
+
+
+            ADB.RunAdbCommandToString("tcpip 5555");
+            DialogResult dialogResult = MessageBox.Show("Does your network IP address table start like this: 192.168.0.xxx, or 192.168.1.xxx? Answer YES for the former, NO for the latter.", "YES = 0, NO = 1", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                ADB.RunAdbCommandToString($"connect 192.168.0.\" {lastWord}\":5555");
+                MessageBox.Show("connect 192.168.0." + lastWord);
+            }
+            else
+            {
+                ADB.RunAdbCommandToString($"connect 192.168.1.\" {lastWord}\":5555");
+                MessageBox.Show("connect 192.168.1." + lastWord + ":5555");
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
         }
     }
 }

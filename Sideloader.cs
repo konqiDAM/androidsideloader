@@ -62,8 +62,8 @@ And all of them added to PATH, without ANY of them, the spoofer won't work!";
                     Logger.Log($"Logging command: {command} from file: {path}");
 
                     if (ADB.DeviceID.Length > 1)
-                        command = $" -s {ADB.DeviceID} {command}";
-                    output += Utilities.GeneralUtilities.startProcess("cmd.exe", RunFromPath, command);
+                        command = $"{ADB.adbFilePath} + \" -s \" + {ADB.DeviceID}";
+                    Utilities.GeneralUtilities.startProcess("cmd.exe", command, cmd);
                 }
             }
             return output;
@@ -77,7 +77,8 @@ And all of them added to PATH, without ANY of them, the spoofer won't work!";
             {
                 foreach (string f in Directory.GetFiles(FolderPath))
                 {
-                    if (Path.GetExtension(f)==".apk")
+                                        if (Path.GetExtension(f)==".apk")
+
                         RecursiveOutput += ADB.Sideload(f);
                 }
 

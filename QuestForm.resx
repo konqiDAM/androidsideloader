@@ -117,4 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label1.Text" xml:space="preserve">
+    <value>Wirless ADB is cool, but be forewarned:
+- It resets at PC reboot or whenever ADB.exe is closed.
+- It has to be re-enabled anytime you reboot your PC.
+- Must be plugged into USB to enable it each time.
+</value>
+  </data>
 </root>
