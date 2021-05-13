@@ -118,10 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label1.Text" xml:space="preserve">
-    <value>Wirless ADB is cool, but be forewarned:
-- It resets at PC reboot or whenever ADB.exe is closed.
-- It has to be re-enabled anytime you reboot your PC.
-- Must be plugged into USB to enable it each time.
+    <value>Wireless ADB works off of your Quest's IP address.
+Is is recommended to give your Quest a Static IP
+ address in your router's settings so it can automatically
+reconnect whenever you launch RSL. If the IP changes 
+you must repeat this process.
 </value>
   </data>
 </root>

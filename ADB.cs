@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace AndroidSideloader
@@ -108,12 +109,55 @@ namespace AndroidSideloader
         }
         public static ProcessOutput Sideload(string path, string packagename = "")
         {
-            WakeDevice();
+       
+
+            ADB.WakeDevice();
+            RunAdbCommandToString(Properties.Settings.Default.IPAddress);
             ProcessOutput ret = new ProcessOutput();
             Program.form.ChangeTitle($"Sideloading {path}");
-            if (packagename.Length>0)
             ret += RunAdbCommandToString($"install -g -r \"{path}\"");
-            Program.form.ChangeTitle($"Sideload done");
+            string out2 = ret.Output + ret.Error;
+            if (out2.Contains("failed"))
+            {
+                string BackupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"Rookie Backups");
+                if (out2.Contains("offline"))
+                {
+                    DialogResult dialogResult2 = MessageBox.Show("Device is offline. Press Yes to reconnect, or if you don't wish to connect and just want to download the game (we suggest unchecking delete games after install from settings menu) then press No.", "Device offline.", MessageBoxButtons.YesNoCancel);
+                    if (dialogResult2 == DialogResult.Yes)
+                        ADB.WakeDevice();
+                    RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+                }
+                else
+                {
+                    ret.Error = "";
+                    MessageBox.Show($"In-place upgrade for {packagename} failed.  We will need to upgrade by uninstalling, and keeping savedata isn't guaranteed.  Continue?", "UPGRADE FAILED!", MessageBoxButtons.OKCancel);
+
+                    string date_str = DateTime.Today.ToString("yyyy.MM.dd");
+                    string CurrBackups = Path.Combine(BackupFolder, date_str);
+
+
+                    MessageBox.Show($"Searching for save files...", "Searching!", MessageBoxButtons.OK);
+                    if (Directory.Exists($"/sdcard/Android/data/{packagename}"))
+                    {
+                        MessageBox.Show($"Trying to backup save to Documents\\Rookie Backups\\{date_str}(year.month.date)\\{packagename}\\data", "Save files found", MessageBoxButtons.OK);
+
+                        Directory.CreateDirectory(CurrBackups);
+                        String CurrbackupPaths = CurrBackups + "\\" + date_str + "\\" + packagename + "\\data";
+                        Directory.CreateDirectory(CurrbackupPaths);
+                        ADB.RunAdbCommandToString($"pull \"/sdcard/Android/data/{packagename}\" \"{CurrbackupPaths}\"");
+                    }
+                    else
+                    {
+                    MessageBox.Show($"No backups found! Continue with the uninstall!", "None Found", MessageBoxButtons.OK);
+
+                    }
+                    ADB.WakeDevice();
+                    ADB.RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+                    ret += ADB.RunAdbCommandToString("shell pm uninstall " + packagename);
+                    ret += RunAdbCommandToString($"install -g -r \"{path}\"");
+                }
+            }
+            Program.form.ChangeTitle("Sideload done");
             return ret;
         }
 

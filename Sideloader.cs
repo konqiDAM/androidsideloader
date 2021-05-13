@@ -57,19 +57,19 @@ And all of them added to PATH, without ANY of them, the spoofer won't work!";
                 if (cmd.StartsWith("adb"))
                 {
                     var regex = new Regex(Regex.Escape("adb"));
-                    var command = regex.Replace("adb", $"\"{ADB.adbFilePath}\"", 1);
+                    var command = regex.Replace(cmd, $"\"{ADB.adbFilePath}\"", 1);
 
                     Logger.Log($"Logging command: {command} from file: {path}");
 
                     if (ADB.DeviceID.Length > 1)
-                        command = $"{ADB.adbFilePath} + \" -s \" + {ADB.DeviceID}";
-                    Utilities.GeneralUtilities.startProcess("cmd.exe", command, cmd);
+                        command = $" -s {ADB.DeviceID} {command}";
+                    output += ADB.RunAdbCommandToString(RunFromPath + command);
                 }
             }
             return output;
         }
 
-        //Recursive sideload any apk file
+        //Recursive sideload any apk fileD
         public static ProcessOutput RecursiveOutput = new ProcessOutput();
         public static void RecursiveSideload(string FolderPath)
         {

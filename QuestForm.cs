@@ -8,7 +8,6 @@ namespace AndroidSideloader
     {
         public static int length = 0;
         public static string[] result;
-        private readonly string executeString;
 
         public QuestForm()
         {
@@ -61,31 +60,36 @@ namespace AndroidSideloader
             result = new string[value];
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
 
         {
-
-            string input = ADB.RunAdbCommandToString("shell ip route").Output;
-            string lastWord = input.Substring(input.LastIndexOf('.') + 1);
-
-
-
+            MessageBox.Show("Make sure your Quest is plugged in VIA USB then press OK.", "Connect Quest now.", MessageBoxButtons.OKCancel);
             ADB.RunAdbCommandToString("tcpip 5555");
-            DialogResult dialogResult = MessageBox.Show("Does your network IP address table start like this: 192.168.0.xxx, or 192.168.1.xxx? Answer YES for the former, NO for the latter.", "YES = 0, NO = 1", MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes)
+
+            MessageBox.Show("Press OK to get your Quest's local IP address.", "Obtain local IP address", MessageBoxButtons.OKCancel);
+            string input = ADB.RunAdbCommandToString("shell ip route").Output;
+   
             {
-                ADB.RunAdbCommandToString($"connect 192.168.0.\" {lastWord}\":5555");
-                MessageBox.Show("connect 192.168.0." + lastWord);
-            }
-            else
-            {
-                ADB.RunAdbCommandToString($"connect 192.168.1.\" {lastWord}\":5555");
-                MessageBox.Show("connect 192.168.1." + lastWord + ":5555");
+                string[] strArrayOne = new string[] { "" };
+                strArrayOne = input.Split(' ');
+                if (strArrayOne[0].Length > 1)
+                {
+                    string IPaddr = strArrayOne[8];
+                    string IPcmnd = "connect " + IPaddr + ":5555";
+                    MessageBox.Show($"Your Quest's local IP address is: {IPaddr}\n\nPlease disconnect your Quest then wait 2 seconds.\nOnce it is disconnected hit OK", "", MessageBoxButtons.OK);
+                    ADB.RunAdbCommandToString(IPcmnd);
+                    await Program.form.CheckForDevice();
+                    Program.form.ChangeTitlebarToDevice();
+                    Program.form.showAvailableSpace();
+                    Properties.Settings.Default.IPAddress = IPcmnd;
+                    Properties.Settings.Default.Save();
+
+                    MessageBox.Show($"Connected!!", "", MessageBoxButtons.OK);
+                }
+                else
+                    MessageBox.Show("No device connected!");
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-        }
     }
 }

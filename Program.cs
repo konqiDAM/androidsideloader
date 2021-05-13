@@ -32,4 +32,14 @@ namespace AndroidSideloader
             File.WriteAllText(Sideloader.CrashLogPath, $"Message: {e.Message}\nData: {e.Data}\nSource: {e.Source}\nTargetSite: {e.TargetSite}");
         }
     }
+    static class Global
+    {
+        private static string _globalVar = "";
+
+        public static string GlobalVar
+        {
+            get { return _globalVar; }
+            set { _globalVar = value; }
+        }
+    }
 }
