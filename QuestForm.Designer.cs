@@ -37,6 +37,8 @@
             this.TextureResTextBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.RefreshRateComboBox = new System.Windows.Forms.ComboBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -56,8 +58,8 @@
             this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.ForeColor = System.Drawing.SystemColors.Control;
-            this.button2.Location = new System.Drawing.Point(73, 263);
+            this.button2.ForeColor = System.Drawing.Color.PaleGreen;
+            this.button2.Location = new System.Drawing.Point(73, 261);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(224, 34);
             this.button2.TabIndex = 7;
@@ -172,12 +174,38 @@
             this.RefreshRateComboBox.TabIndex = 0;
             this.RefreshRateComboBox.Text = "Select refresh rate";
             // 
+            // button3
+            // 
+            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button3.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.button3.Location = new System.Drawing.Point(134, 325);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(103, 23);
+            this.button3.TabIndex = 8;
+            this.button3.Text = "Revert to USB";
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.label2.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.label2.Location = new System.Drawing.Point(3, 301);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(365, 15);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Use this button to delete the saved Wireless connection.";
+            // 
             // QuestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(370, 312);
+            this.ClientSize = new System.Drawing.Size(370, 359);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.CPUComboBox);
@@ -206,7 +234,8 @@
         private System.Windows.Forms.ComboBox CPUComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
-    
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label2;
     }
 
 }

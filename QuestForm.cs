@@ -64,19 +64,22 @@ namespace AndroidSideloader
 
         {
             MessageBox.Show("Make sure your Quest is plugged in VIA USB then press OK.", "Connect Quest now.", MessageBoxButtons.OKCancel);
+            ADB.RunAdbCommandToString("devices");
             ADB.RunAdbCommandToString("tcpip 5555");
 
             MessageBox.Show("Press OK to get your Quest's local IP address.", "Obtain local IP address", MessageBoxButtons.OKCancel);
+            Thread.Sleep(1000);
             string input = ADB.RunAdbCommandToString("shell ip route").Output;
    
             {
                 string[] strArrayOne = new string[] { "" };
                 strArrayOne = input.Split(' ');
-                if (strArrayOne[0].Length > 1)
+                if (strArrayOne[0].Length > 7)
                 {
                     string IPaddr = strArrayOne[8];
                     string IPcmnd = "connect " + IPaddr + ":5555";
                     MessageBox.Show($"Your Quest's local IP address is: {IPaddr}\n\nPlease disconnect your Quest then wait 2 seconds.\nOnce it is disconnected hit OK", "", MessageBoxButtons.OK);
+                    Thread.Sleep(2000);
                     ADB.RunAdbCommandToString(IPcmnd);
                     await Program.form.CheckForDevice();
                     Program.form.ChangeTitlebarToDevice();
@@ -85,11 +88,28 @@ namespace AndroidSideloader
                     Properties.Settings.Default.Save();
 
                     MessageBox.Show($"Connected!!", "", MessageBoxButtons.OK);
+                    Program.form.ChangeTitlebarToDevice();
                 }
                 else
                     MessageBox.Show("No device connected!");
             }
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Make sure your device is not connected to USB and press OK.");
+            ADB.RunAdbCommandToString("shell USB");
+            Thread.Sleep(2000);
+            ADB.RunAdbCommandToString("disconnect");
+            Thread.Sleep(2000);
+            ADB.RunAdbCommandToString("kill-server");
+            Thread.Sleep(2000);
+            ADB.RunAdbCommandToString("start-server");
+            Properties.Settings.Default.IPAddress = "";
+            Properties.Settings.Default.Save();
+            Program.form.GetDeviceID();
+            Program.form.ChangeTitlebarToDevice();
+            MessageBox.Show("Relaunch Rookie to complete the process and switch back to USB adb.");
+        }
     }
 }

@@ -109,10 +109,12 @@ namespace AndroidSideloader
         }
         public static ProcessOutput Sideload(string path, string packagename = "")
         {
-       
 
-            ADB.WakeDevice();
-            RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+            WakeDevice();
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.IPAddress))
+            {
+                ADB.RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+            }
             ProcessOutput ret = new ProcessOutput();
             Program.form.ChangeTitle($"Sideloading {path}");
             ret += RunAdbCommandToString($"install -g -r \"{path}\"");
@@ -125,11 +127,20 @@ namespace AndroidSideloader
                     DialogResult dialogResult2 = MessageBox.Show("Device is offline. Press Yes to reconnect, or if you don't wish to connect and just want to download the game (we suggest unchecking delete games after install from settings menu) then press No.", "Device offline.", MessageBoxButtons.YesNoCancel);
                     if (dialogResult2 == DialogResult.Yes)
                         ADB.WakeDevice();
-                    RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+
+
+                    if (!string.IsNullOrEmpty(Properties.Settings.Default.IPAddress))
+                    {
+                        ADB.RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+                    }
+
                 }
                 else
                 {
-                    ret.Error = "";
+                    ret.Error = string.Empty;
+                    ret.Output = string.Empty;
+
+
                     MessageBox.Show($"In-place upgrade for {packagename} failed.  We will need to upgrade by uninstalling, and keeping savedata isn't guaranteed.  Continue?", "UPGRADE FAILED!", MessageBoxButtons.OKCancel);
 
                     string date_str = DateTime.Today.ToString("yyyy.MM.dd");
@@ -148,11 +159,14 @@ namespace AndroidSideloader
                     }
                     else
                     {
-                    MessageBox.Show($"No backups found! Continue with the uninstall!", "None Found", MessageBoxButtons.OK);
+                    MessageBox.Show($"No savedata found! Continue with the uninstall!", "None Found", MessageBoxButtons.OK);
 
                     }
-                    ADB.WakeDevice();
-                    ADB.RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+                    ADB.WakeDevice(); 
+                    if (!string.IsNullOrEmpty(Properties.Settings.Default.IPAddress))
+                    {
+                        ADB.RunAdbCommandToString(Properties.Settings.Default.IPAddress);
+                    }
                     ret += ADB.RunAdbCommandToString("shell pm uninstall " + packagename);
                     ret += RunAdbCommandToString($"install -g -r \"{path}\"");
                 }
