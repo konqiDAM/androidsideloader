@@ -12,7 +12,9 @@ using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
+
 
 namespace AndroidSideloader
 {
@@ -34,12 +36,24 @@ namespace AndroidSideloader
         public MainForm()
 
         {
+            System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+
+            t.Interval = 840000; // 14 mins between wakeup commands
+            t.Tick += new EventHandler(timer_Tick);
+            t.Start();
             InitializeComponent();
             lvwColumnSorter = new ListViewColumnSorter();
             this.gamesListView.ListViewItemSorter = lvwColumnSorter;
         }
 
         private string oldTitle = "";
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+
+            ADB.RunAdbCommandToString("shell input keyevent KEYCODE_WAKEUP");
+        }
+
 
         public async void ChangeTitle(string txt, bool reset = true)
         {
@@ -115,7 +129,7 @@ namespace AndroidSideloader
             ADB.DeviceID = GetDeviceID();
             Thread t1 = new Thread(() =>
             {
-                output = ADB.RunAdbCommandToString("devices").Output;
+            output = ADB.RunAdbCommandToString("devices").Output;
             });
             t1.Start();
 
@@ -132,18 +146,23 @@ namespace AndroidSideloader
             foreach (string currLine in line)
             {
                 if (i > 0 && currLine.Length > 0)
-                {
-                    Devices.Add(currLine.Split('	')[0]);
-                    devicesComboBox.Items.Add(currLine.Split('	')[0]);
-                    Logger.Log(currLine.Split('	')[0] + "\n", false);
-                }
-                Debug.WriteLine(currLine);
+                        {
+                            Devices.Add(currLine.Split('	')[0]);
+                            devicesComboBox.Items.Add(currLine.Split('	')[0]);
+                            Logger.Log(currLine.Split('	')[0] + "\n", false);
+                        }
+                        Debug.WriteLine(currLine);
                 i++;
             }
 
             if (devicesComboBox.Items.Count > 0)
                 devicesComboBox.SelectedIndex = 0;
-
+            foreach(var item in devicesComboBox.Items)
+            {
+                string result = $"{Properties.Settings.Default.ADBPath} shell -s {item} getprop ro.product.system.manufacturer";
+                if (ADB.RunCommandToString(result).Output.Contains("Oculus"))
+                    devicesComboBox.SelectedItem = item;
+            }   
             return devicesComboBox.SelectedIndex;
         }
 
@@ -289,8 +308,8 @@ namespace AndroidSideloader
 
         private async void Form1_Load(object sender, EventArgs e)
         {
-            string adbFile = "C:\\RSL\\2.14HF5\\adb\\adb.exe";
-            string adbDir = "C:\\RSL\\2.14HF5\\adb";
+            string adbFile = "C:\\RSL\\2.1HF5\\adb\\adb.exe";
+            string adbDir = "C:\\RSL\\2.1HF5\\adb";
             string fileName = "";
             string destFile = "";
             Properties.Settings.Default.MainDir = Environment.CurrentDirectory;
@@ -847,6 +866,7 @@ Do you want to delete the {Sideloader.CrashLogPath} (if you press yes, this mess
             gamesListView.EndUpdate();
         }
 
+
         private async void Form1_Shown(object sender, EventArgs e)
         {
             new Thread(() =>
@@ -977,6 +997,7 @@ without him none of this would be possible
 
         private async void ADBWirelessEnable_Click(object sender, EventArgs e)
         {
+
             ADB.WakeDevice();
             DialogResult dialogResult = MessageBox.Show("Make sure your Quest is plugged in VIA USB then press OK, if you need a moment press Cancel and come back when you're ready.", "Connect Quest now.", MessageBoxButtons.OKCancel);
             if (dialogResult == DialogResult.Cancel)
@@ -989,28 +1010,35 @@ without him none of this would be possible
             Thread.Sleep(1000);
             string input = ADB.RunAdbCommandToString("shell ip route").Output;
 
+            Properties.Settings.Default.WirelessADB = true;
+            Properties.Settings.Default.Save();
+            string[] strArrayOne = new string[] { "" };
+            strArrayOne = input.Split(' ');
+            if (strArrayOne[0].Length > 7)
             {
-                string[] strArrayOne = new string[] { "" };
-                strArrayOne = input.Split(' ');
-                if (strArrayOne[0].Length > 7)
+                string IPaddr = strArrayOne[8];
+                string IPcmnd = "connect " + IPaddr + ":5555";
+                MessageBox.Show($"Your Quest's local IP address is: {IPaddr}\n\nPlease disconnect your Quest then wait 2 seconds.\nOnce it is disconnected hit OK", "", MessageBoxButtons.OK);
+                Thread.Sleep(2000);
+                ADB.RunAdbCommandToString(IPcmnd);
+                await Program.form.CheckForDevice();
+                Program.form.ChangeTitlebarToDevice();
+                Program.form.showAvailableSpace();
+                Properties.Settings.Default.IPAddress = IPcmnd;
+                Properties.Settings.Default.Save();
+                 
+                MessageBox.Show($"Connected! We can now automatically disable the Quest wifi chip from falling asleep. This makes it so Rookie can work wirelessly even if the device has entered \"sleep mode\". This setting is NOT permanent and resets upon Quest reboot, just like wireless ADB functionality.\n\nNOTE: This may cause the device battery to drain while it is in sleep mode at a very slightly increased rate. We recommend this setting for the majority of users for ease of use purposes. If you click NO you must keep your Quest connected to a charger or wake your device and then put it back on hold before using Rookie wirelessly. Do you want us to stop sleep mode from disabling wireless ADB?", "", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
                 {
-                    string IPaddr = strArrayOne[8];
-                    string IPcmnd = "connect " + IPaddr + ":5555";
-                    MessageBox.Show($"Your Quest's local IP address is: {IPaddr}\n\nPlease disconnect your Quest then wait 2 seconds.\nOnce it is disconnected hit OK", "", MessageBoxButtons.OK);
-                    Thread.Sleep(2000);
-                    ADB.RunAdbCommandToString(IPcmnd);
-                    await Program.form.CheckForDevice();
-                    Program.form.ChangeTitlebarToDevice();
-                    Program.form.showAvailableSpace();
-                    Properties.Settings.Default.IPAddress = IPcmnd;
-                    Properties.Settings.Default.Save();
 
-                    MessageBox.Show($"Connected!!", "", MessageBoxButtons.OK);
-                    Program.form.ChangeTitlebarToDevice();
+                    ADB.RunAdbCommandToString("shell settings put global wifi_wakeup_available 1");
+                    ADB.RunAdbCommandToString("shell settings put global wifi_wakeup_enabled 1");
                 }
-                else
-                    MessageBox.Show("No device connected!");
+                Program.form.ChangeTitlebarToDevice();
             }
+            else
+                MessageBox.Show("No device connected!");
+
         }
 
         private async void listApkButton_Click(object sender, EventArgs e)
@@ -1155,6 +1183,7 @@ without him none of this would be possible
             while (gamesQueueList.Count > 0)
             {
                 gameName = gamesQueueList.ToArray()[0];
+                string packagename = Sideloader.gameNameToPackageName(gameName);
                 string dir = Path.GetDirectoryName(gameName);
           
                 string gameDirectory = Environment.CurrentDirectory + "\\" + gameName;
@@ -1274,12 +1303,6 @@ without him none of this would be possible
                         {
                             Thread apkThread = new Thread(() =>
                             {
-                                string packagename = "";
-                                foreach (var release in SideloaderRCLONE.games)
-                                {
-                                    if (string.Equals(release[SideloaderRCLONE.ReleaseNameIndex], gameName))
-                                        packagename = release[SideloaderRCLONE.PackageNameIndex];
-                                }
                                 ADB.WakeDevice();
 
                                 output += ADB.Sideload(file, packagename);
