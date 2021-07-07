@@ -84,7 +84,7 @@ namespace AndroidSideloader
             rclone.WaitForExit();
 
             //if there is one of these errors, we switch the mirrors
-            if (error.Contains("cannot fetch token") || error.Contains("authError") || (error.Contains("quota") && error.Contains("exceeded")))
+            if (error.Contains("cannot fetch token") || error.Contains("authError") || (error.Contains("quota") || error.Contains("exceeded")))
             {
                 string oldRemote = MainForm.currentRemote;
                 try
@@ -102,6 +102,7 @@ namespace AndroidSideloader
                 prcoutput.Output = output;
                 prcoutput.Error = error;
             }
+            if (!output.Contains("Game Name;Release APK Path;"))
             Logger.Log($"Rclone error: {error}\nRclone Output: {output}");
             return prcoutput;
         }
