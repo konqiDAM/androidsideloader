@@ -1,4 +1,5 @@
-﻿using AndroidSideloader.Utilities;
+﻿using AndroidSideloader.NetworkUtils;
+using AndroidSideloader.Utilities;
 using JR.Utils.GUI.Forms;
 using Newtonsoft.Json;
 using SergeUtils;
@@ -233,6 +234,13 @@ namespace AndroidSideloader
                     File.Delete($"{Environment.CurrentDirectory}\\crashlog.txt");
                 }
             }
+
+            Thread t1 = new Thread(() =>
+            {
+                WebSocketListener.Start();
+            });
+            t1.IsBackground = true;
+            t1.Start();
         }
 
 

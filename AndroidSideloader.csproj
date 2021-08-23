@@ -168,6 +168,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NetworkUtils\WebSocketListener.cs" />
     <Compile Include="Sideloader\ProcessOutput.cs" />
     <Compile Include="Sideloader\RCLONE.cs" />
     <Compile Include="Sideloader\Utilities.cs" />
